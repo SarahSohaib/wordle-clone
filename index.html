@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wordle Clone V2</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121213;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #90caf9;
+    }
+
+    select, input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+      background-color: #1e1e1e;
+      color: white;
+      border: 1px solid #444;
+    }
+
+    #grid {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .guess-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .letter-box {
+      width: 60px;
+      height: 60px;
+      font-size: 32px;
+      font-weight: bold;
+      text-transform: uppercase;
+      text-align: center;
+      line-height: 60px;
+      border-radius: 5px;
+      background-color: #3a3a3c;
+      color: white;
+      transition: background-color 0.3s ease;
+      animation: pop 0.3s ease-in-out;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    .correct { background-color: #538d4e !important; }
+    .present { background-color: #b59f3b !important; }
+    .absent  { background-color: #3a3a3c !important; }
+
+    #message {
+      margin-top: 10px;
+      font-weight: bold;
+      height: 24px;
+    }
+
+    #guessedWords {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #bdbdbd;
+    }
+
+    .keyboard {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .keyboard-row {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .key {
+      width: 40px;
+      height: 60px;
+      background-color: #818384;
+      color: white;
+      border: none;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .key.special {
+      width: 60px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Wordle Clone V2</h1>
+
+  <select id="category">
+    <option value="Fruits">Fruits</option>
+    <option value="Animals">Animals</option>
+    <option value="Countries">Countries</option>
+  </select>
+  <button onclick="selectWord()">Start Game</button>
+
+  <input type="text" id="guessInput" maxlength="5" placeholder="Enter 5-letter word" disabled />
+  <button onclick="submitGuess()" id="guessButton" disabled>Guess</button>
+
+  <div id="grid"></div>
+  <div id="message"></div>
+  <div id="guessedWords"></div>
+
+<div class="keyboard">
+<!-- First Row -->
+  <div class="keyboard-row">
+    <button class="key" id="key-q" onclick="keyPress('q')">Q</button>
+    <button class="key" id="key-w" onclick="keyPress('w')">W</button>
+    <button class="key" id="key-e" onclick="keyPress('e')">E</button>
+    <button class="key" id="key-r" onclick="keyPress('r')">R</button>
+    <button class="key" id="key-t" onclick="keyPress('t')">T</button>
+    <button class="key" id="key-y" onclick="keyPress('y')">Y</button>
+    <button class="key" id="key-u" onclick="keyPress('u')">U</button>
+    <button class="key" id="key-i" onclick="keyPress('i')">I</button>
+    <button class="key" id="key-o" onclick="keyPress('o')">O</button>
+    <button class="key" id="key-p" onclick="keyPress('p')">P</button>
+</div>
+
+<!-- Second Row -->
+<div class="keyboard-row">
+  <div class="spacer-half"></div>
+  <button class="key" id="key-a" onclick="keyPress('a')">A</button>
+  <button class="key" id="key-s" onclick="keyPress('s')">S</button>
+  <button class="key" id="key-d" onclick="keyPress('d')">D</button>
+  <button class="key" id="key-f" onclick="keyPress('f')">F</button>
+  <button class="key" id="key-g" onclick="keyPress('g')">G</button>
+  <button class="key" id="key-h" onclick="keyPress('h')">H</button>
+  <button class="key" id="key-j" onclick="keyPress('j')">J</button>
+  <button class="key" id="key-k" onclick="keyPress('k')">K</button>
+  <button class="key" id="key-l" onclick="keyPress('l')">L</button>
+  <div class="spacer-half"></div>
+</div>
+
+<!-- Third Row -->
+<div class="keyboard-row">
+  <button class="key large" id="key-enter" onclick="keyPress('Enter')">Enter</button>
+  <button class="key" id="key-z" onclick="keyPress('z')">Z</button>
+  <button class="key" id="key-x" onclick="keyPress('x')">X</button>
+  <button class="key" id="key-c" onclick="keyPress('c')">C</button>
+  <button class="key" id="key-v" onclick="keyPress('v')">V</button>
+  <button class="key" id="key-b" onclick="keyPress('b')">B</button>
+  <button class="key" id="key-n" onclick="keyPress('n')">N</button>
+  <button class="key" id="key-m" onclick="keyPress('m')">M</button>
+  <button class="key large" id="key-backspace" onclick="keyPress('Backspace')">←</button>
+</div>
+</div>
+
+  <script>
+    let category = "";
+    const guessedWords = [];
+
+    function selectWord() {
+      category = document.getElementById("category").value;
+      fetch("/get_word", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ category: category })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("message").innerText = "Game started! Enter your guess.";
+        document.getElementById("grid").innerHTML = "";
+        document.getElementById("guessedWords").innerText = "";
+        guessedWords.length = 0;
+        document.getElementById("guessInput").disabled = false;
+        document.getElementById("guessButton").disabled = false;
+        document.getElementById("guessInput").focus();
+      });
+    }
+
+    function submitGuess() {
+      const input = document.getElementById("guessInput");
+      const guess = input.value.trim().toLowerCase();
+      if (!/^[a-zA-Z]{5}$/.test(guess)) {
+        document.getElementById("message").innerText = "Please enter a valid 5-letter word.";
+        return;
+      }
+
+      fetch("/guess", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ category: category, guess: guess })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          document.getElementById("message").innerText = data.error;
+        } else {
+          const row = document.createElement("div");
+          row.classList.add("guess-row");
+
+          data.result.forEach((status, i) => {
+            const box = document.createElement("div");
+            box.classList.add("letter-box", status);
+            box.innerText = guess[i].toUpperCase();
+            row.appendChild(box);
+          });
+
+          document.getElementById("grid").appendChild(row);
+          document.getElementById("message").innerText = data.message || "";
+          guessedWords.push(guess);
+          document.getElementById("guessedWords").innerText = "Guessed: " + guessedWords.join(", ");
+        }
+        input.value = "";
+        input.focus();
+      });
+    }
+
+    function keyPress(letter) {
+      const input = document.getElementById("guessInput");
+      if (!input.disabled && input.value.length < 5) {
+        input.value += letter;
+      }
+    }
+
+    function backspace() {
+      const input = document.getElementById("guessInput");
+      if (!input.disabled) {
+        input.value = input.value.slice(0, -1);
+      }
+    }
+
+    document.getElementById("guessInput").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        submitGuess();
+      }
+    });
+  </script>
+</body>
+</html>
