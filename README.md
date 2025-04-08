@@ -1,10 +1,9 @@
-# Wordle Clone
+#Wordle Clone
 
 A minimalist Wordle-inspired web app, built using **Flask** on the backend and **vanilla HTML, CSS, and JavaScript** on the frontend.
 
 This version lets players pick a category before each game and challenges them to guess a 5-letter word with feedback after every attempt. A virtual keyboard and color-coded hints enhance the gameplay. Still a work in progress.
 
----
 
 ## Features
 
@@ -14,7 +13,6 @@ This version lets players pick a category before each game and challenges them t
 - 🎯 Attempt tracking with guess validation
 - 🎨 Color-coded results: correct, present, and absent letters
 
----
 
 ## Tech Stack
 
@@ -22,7 +20,7 @@ This version lets players pick a category before each game and challenges them t
 - **Backend:** Python with Flask
 - **Deployment (Planned):** Render
 
----
+
 
 ## Getting Started
 
@@ -47,7 +45,7 @@ To run the app locally:
 4. **Open the app in your browser:**
    Visit `http://localhost:5000`
 
----
+
 
 ## To-Do
 
@@ -56,8 +54,8 @@ To run the app locally:
 - [ ] Enhance keyboard UX
 - [ ] Add animations and polish
 - [ ] Final deployment on Render with a public URL
+      
 
----
 
 ## License
 
